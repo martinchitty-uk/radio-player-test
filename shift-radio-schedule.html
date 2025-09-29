@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIFT TTF RADIO Schedule</title>
+</head>
+<body>
+    <!-- SHIFT TTF Radio Schedule - WordPress Embed Version -->
+    <div id="shift-schedule-widget">
+        <style>
+            #shift-schedule-widget {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
+
+            #shift-schedule-widget * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            #shift-schedule-widget .shift-schedule-container {
+                width: 100%;
+                background: white;
+                border: 1px solid black;
+                padding: 20px;
+                height: 600px;
+                max-height: 600px;
+                overflow: hidden;
+            }
+
+            @media (max-width: 480px) {
+                #shift-schedule-widget .shift-schedule-container {
+                    padding: 15px;
+                    height: auto;
+                    max-height: 100vh;
+                }
+            }
+
+            #shift-schedule-widget .shift-logo-section {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            #shift-schedule-widget .shift-logo {
+                width: 70px;
+                height: auto;
+                margin: 0 auto 8px;
+            }
+
+            #shift-schedule-widget .shift-station-name {
+                font-size: 13px;
+                letter-spacing: 2px;
+                font-weight: 300;
+                color: #000;
+            }
+
+            #shift-schedule-widget .shift-logo img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            #shift-schedule-widget .shift-station-name {
+                font-size: 14px;
+                letter-spacing: 2px;
+                font-weight: 300;
+                color: #000;
+            }
+
+            #shift-schedule-widget .shift-day-tabs {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 0;
+                padding-bottom: 12px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #shift-schedule-widget .shift-day-tab {
+                flex: 1;
+                min-width: 55px;
+                aspect-ratio: 1;
+                border: 1px solid black;
+                background: white;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 4px;
+                transition: all 0.2s;
+                font-size: 10px;
+                text-align: center;
+            }
+
+            #shift-schedule-widget .shift-day-name {
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 2px;
+                font-size: 9px;
+            }
+
+            #shift-schedule-widget .shift-day-date {
+                font-size: 8px;
+                opacity: 0.7;
+            }
+
+            #shift-schedule-widget .shift-day-tab:hover {
+                background: #f0f0f0;
+            }
+
+            #shift-schedule-widget .shift-day-tab.active {
+                background: black;
+                color: white;
+            }
+
+            #shift-schedule-widget .shift-day-name {
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 2px;
+            }
+
+            #shift-schedule-widget .shift-day-date {
+                font-size: 9px;
+                opacity: 0.7;
+            }
+
+            #shift-schedule-widget .shift-schedule-content {
+                height: 350px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                position: relative;
+                border-top: 1px solid black;
+                padding: 12px 0;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                scroll-behavior: smooth;
+            }
+
+            @media (max-width: 600px) {
+                #shift-schedule-widget .shift-schedule-content {
+                    height: 320px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                #shift-schedule-widget .shift-schedule-content {
+                    height: 300px;
+                }
+            }
+
+            #shift-schedule-widget .shift-schedule-content::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            #shift-schedule-widget .shift-schedule-content::-webkit-scrollbar-track {
+                background: #f0f0f0;
+            }
+
+            #shift-schedule-widget .shift-schedule-content::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+            }
+
+            #shift-schedule-widget .shift-schedule-content::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+            #shift-schedule-widget .shift-show-item {
+                padding: 15px 10px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            #shift-schedule-widget .shift-show-item:last-child {
+                border-bottom: none;
+            }
+
+            #shift-schedule-widget .shift-show-item.current {
+                background: #f0f0f0;
+                margin: 0 -10px;
+                padding: 15px 10px 15px 14px;
+                border-left: 4px solid black;
+                position: relative;
+            }
+
+            /* Safari-specific styles using JavaScript detection */
+            #shift-schedule-widget.safari-browser .shift-show-item.current {
+                background: #f0f0f0;
+                animation: none;
+            }
+
+            @media (max-width: 480px) {
+                #shift-schedule-widget .shift-show-item.current {
+                    margin: 0 -10px;
+                    padding: 15px 10px 15px 14px;
+                }
+            }
+
+            /* Remove complex animations that don't work well in Safari */
+
+            #shift-schedule-widget .shift-show-times {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 6px;
+                font-weight: 500;
+            }
+
+            #shift-schedule-widget .shift-show-name {
+                font-size: 15px;
+                font-weight: 500;
+                color: #000;
+                margin-bottom: 6px;
+            }
+
+            #shift-schedule-widget .shift-show-url {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+
+            #shift-schedule-widget .shift-show-url a {
+                color: #666;
+                text-decoration: none;
+                word-break: break-all;
+            }
+
+            #shift-schedule-widget .shift-show-url a:hover {
+                color: #000;
+                text-decoration: underline;
+            }
+
+            #shift-schedule-widget .shift-show-description {
+                font-size: 12px;
+                line-height: 1.4;
+                color: #333;
+            }
+
+            #shift-schedule-widget .shift-description-text {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                transition: all 0.3s;
+            }
+
+            #shift-schedule-widget .shift-description-text.expanded {
+                -webkit-line-clamp: unset;
+            }
+
+            #shift-schedule-widget .shift-expand-button {
+                display: inline-block;
+                margin-top: 5px;
+                font-size: 11px;
+                color: #666;
+                cursor: pointer;
+                border: none;
+                background: none;
+                padding: 0;
+                font-family: inherit;
+            }
+
+            #shift-schedule-widget .shift-expand-button:hover {
+                color: #000;
+            }
+
+            #shift-schedule-widget .shift-expand-arrow {
+                display: inline-block;
+                margin-left: 3px;
+                transition: transform 0.3s;
+            }
+
+            #shift-schedule-widget .shift-expand-arrow.rotated {
+                transform: rotate(180deg);
+            }
+
+            #shift-schedule-widget .shift-loading {
+                text-align: center;
+                color: #666;
+                font-size: 13px;
+                padding: 40px 0;
+            }
+
+            #shift-schedule-widget .shift-error {
+                color: #ff0000;
+                font-size: 13px;
+                text-align: center;
+                padding: 40px 0;
+            }
+
+            #shift-schedule-widget .shift-empty {
+                color: #666;
+                font-size: 13px;
+                text-align: center;
+                padding: 40px 0;
+            }
+
+            #shift-schedule-widget .shift-current-indicator {
+                display: inline-block;
+                background: black;
+                color: white;
+                font-size: 9px;
+                padding: 2px 6px;
+                margin-left: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                vertical-align: middle;
+            }
+        </style>
+
+        <div class="shift-schedule-container">
+            <div class="shift-logo-section">
+                <div class="shift-logo">
+                    <img src="shift-logo.jpg" alt="SHIFT TTF RADIO Logo" onerror="this.style.display='none'">
+                </div>
+                <div class="shift-station-name">SHIFT TTF RADIO - SCHEDULE</div>
+            </div>
+
+            <div class="shift-day-tabs" id="shiftDayTabs">
+                <!-- Tabs will be generated dynamically -->
+            </div>
+
+            <div class="shift-schedule-content" id="shiftScheduleContent">
+                <div class="shift-loading">Loading schedule...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+        
+        const ShiftSchedule = {
+            dayTabs: null,
+            scheduleContent: null,
+            weekData: null,
+            selectedDay: 0,
+            days: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+            currentShowId: null,
+
+            init: function() {
+                this.dayTabs = document.getElementById('shiftDayTabs');
+                this.scheduleContent = document.getElementById('shiftScheduleContent');
+
+                if (!this.dayTabs || !this.scheduleContent) {
+                    console.error('SHIFT Schedule: Required elements not found');
+                    return;
+                }
+
+                this.generateDayTabs();
+                this.fetchSchedule();
+                
+                // Refresh every 5 minutes to update current show
+                setInterval(() => {
+                    this.updateCurrentShow();
+                }, 300000);
+            },
+
+            generateDayTabs: function() {
+                const today = new Date();
+                let tabsHtml = '';
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + i);
+                    
+                    const dayName = i === 0 ? 'TODAY' : this.days[date.getDay()];
+                    const dayDate = date.getDate();
+                    const month = date.getMonth() + 1;
+                    
+                    tabsHtml += `
+                        <div class="shift-day-tab ${i === 0 ? 'active' : ''}" 
+                             data-day="${i}" 
+                             onclick="ShiftSchedule.selectDay(${i})">
+                            <div class="shift-day-name">${dayName}</div>
+                            <div class="shift-day-date">${dayDate}/${month}</div>
+                        </div>
+                    `;
+                }
+
+                this.dayTabs.innerHTML = tabsHtml;
+            },
+
+            selectDay: function(dayIndex) {
+                this.selectedDay = dayIndex;
+                
+                // Update active tab
+                const tabs = this.dayTabs.querySelectorAll('.shift-day-tab');
+                tabs.forEach(tab => tab.classList.remove('active'));
+                if (tabs[dayIndex]) {
+                    tabs[dayIndex].classList.add('active');
+                }
+
+                // Display schedule for selected day
+                this.displaySchedule();
+                
+                // Scroll to top when switching days (unless it's today with a current show)
+                if (dayIndex !== 0 || !this.currentShowId) {
+                    this.scheduleContent.scrollTop = 0;
+                }
+            },
+
+            fetchSchedule: async function() {
+                try {
+                    const response = await fetch('https://shift.airtime.pro/api/week-info');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('API Response received, processing...');
+                    
+                    // Process the data to organize by day
+                    this.weekData = this.processScheduleData(data);
+                    this.displaySchedule();
+                    
+                } catch (error) {
+                    console.error('Error fetching schedule:', error);
+                    this.scheduleContent.innerHTML = `
+                        <div class="shift-error">
+                            Unable to load schedule<br>
+                            <small>${error.message}</small>
+                        </div>
+                    `;
+                }
+            },
+
+            processScheduleData: function(data) {
+                // Initialize array for 7 days
+                const weekSchedule = Array(7).fill(null).map(() => []);
+                const today = new Date();
+                const todayDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                
+                console.log('Today is:', ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][todayDay]);
+
+                // Map day names to day numbers
+                const dayMap = {
+                    'sunday': 0,
+                    'monday': 1,
+                    'tuesday': 2,
+                    'wednesday': 3,
+                    'thursday': 4,
+                    'friday': 5,
+                    'saturday': 6
+                };
+
+                // First, process current week days
+                Object.keys(dayMap).forEach(dayName => {
+                    if (data[dayName] && Array.isArray(data[dayName]) && data[dayName].length > 0) {
+                        const targetDayOfWeek = dayMap[dayName];
+                        let daysFromToday = targetDayOfWeek - todayDay;
+                        
+                        // If negative, this day has passed - will use next week's data
+                        if (daysFromToday < 0) {
+                            daysFromToday += 7;
+                        }
+                        
+                        if (daysFromToday < 7) {
+                            console.log(`Adding ${data[dayName].length} shows to ${dayName} (index ${daysFromToday})`);
+                            weekSchedule[daysFromToday] = data[dayName];
+                        }
+                    }
+                });
+
+                // Then fill any gaps with next week's data
+                Object.keys(dayMap).forEach(dayName => {
+                    const nextKey = 'next' + dayName;
+                    if (data[nextKey] && Array.isArray(data[nextKey]) && data[nextKey].length > 0) {
+                        const targetDayOfWeek = dayMap[dayName];
+                        let daysFromToday = targetDayOfWeek - todayDay;
+                        
+                        if (daysFromToday <= 0) {
+                            daysFromToday += 7;
+                        }
+                        
+                        // Only add if within 7 days and slot is empty
+                        if (daysFromToday < 7 && weekSchedule[daysFromToday].length === 0) {
+                            console.log(`Adding ${data[nextKey].length} shows from next week to ${dayName} (index ${daysFromToday})`);
+                            weekSchedule[daysFromToday] = data[nextKey];
+                        }
+                    }
+                });
+
+                console.log('Schedule for next 7 days:', weekSchedule.map(day => day.length + ' shows'));
+                return weekSchedule;
+            },
+
+            getCurrentShow: function() {
+                const now = new Date();
+                const currentDay = 0; // Today
+                
+                if (!this.weekData || !this.weekData[currentDay]) {
+                    console.log('No week data or no shows today');
+                    return null;
+                }
+
+                const currentTimeStr = now.toTimeString().substring(0, 5); // HH:MM format
+                console.log('Checking for current show at:', currentTimeStr);
+
+                for (const show of this.weekData[currentDay]) {
+                    // Handle different possible field names
+                    const startStr = show.start_timestamp || show.starts || show.start;
+                    const endStr = show.end_timestamp || show.ends || show.end;
+                    
+                    if (!startStr || !endStr) {
+                        console.log('Missing time data for show:', show);
+                        continue;
+                    }
+                    
+                    // Extract just the time portions since the API already gives us London time
+                    const startTime = startStr.substring(11, 16); // Extract HH:MM
+                    const endTime = endStr.substring(11, 16);     // Extract HH:MM
+                    
+                    console.log('Show:', show.name, 'Time:', startTime, '-', endTime, 'Current:', currentTimeStr);
+                    
+                    // Simple string comparison works because times are in HH:MM format
+                    if (currentTimeStr >= startTime && currentTimeStr < endTime) {
+                        console.log('>>> Current show found:', show.name);
+                        return show.instance_id || show.id || show.name;
+                    }
+                }
+                
+                console.log('No current show found');
+                return null;
+            },
+
+            parseDateTime: function(dateString) {
+                if (!dateString) return new Date();
+                
+                // The API returns times in London timezone already
+                // Just parse them as local times
+                // Remove 'T' if present and replace with space for better compatibility
+                const cleanDate = dateString.replace('T', ' ').replace('Z', '');
+                return new Date(cleanDate);
+            },
+
+            formatTime: function(dateString) {
+                if (!dateString) return 'TBA';
+                
+                // Extract time directly since it's already in London timezone
+                const match = dateString.match(/(\d{2}):(\d{2})/);
+                return match ? `${match[1]}:${match[2]}` : 'TBA';
+            },
+
+            displaySchedule: function() {
+                if (!this.weekData) {
+                    this.scheduleContent.innerHTML = '<div class="shift-loading">Loading schedule...</div>';
+                    return;
+                }
+
+                const dayShows = this.weekData[this.selectedDay];
+                
+                if (!dayShows || dayShows.length === 0) {
+                    this.scheduleContent.innerHTML = '<div class="shift-empty">No shows scheduled for this day</div>';
+                    return;
+                }
+
+                // Get current show ID if viewing today
+                this.currentShowId = this.selectedDay === 0 ? this.getCurrentShow() : null;
+                console.log('Current show ID:', this.currentShowId);
+
+                let scheduleHtml = '';
+                let currentShowIndex = -1;
+                
+                dayShows.forEach((show, index) => {
+                    const showId = show.instance_id || show.id || show.name;
+                    const isCurrent = this.currentShowId && (showId === this.currentShowId || show.name === this.currentShowId);
+                    const descriptionId = `desc_${this.selectedDay}_${index}`;
+                    
+                    if (isCurrent) {
+                        currentShowIndex = index;
+                        console.log('Marking show as current:', show.name);
+                    }
+                    
+                    scheduleHtml += `
+                        <div class="shift-show-item ${isCurrent ? 'current' : ''}" id="shift-show-${index}">
+                            <div class="shift-show-times">
+                                ${this.formatTime(show.start_timestamp || show.starts)} - ${this.formatTime(show.end_timestamp || show.ends)}
+                                ${isCurrent ? '<span class="shift-current-indicator">NOW PLAYING</span>' : ''}
+                            </div>
+                            <div class="shift-show-name">${show.name || 'Untitled Show'}</div>
+                            ${show.url ? `
+                                <div class="shift-show-url">
+                                    <a href="${show.url}" target="_blank" rel="noopener noreferrer">${show.url}</a>
+                                </div>
+                            ` : ''}
+                            ${show.description ? `
+                                <div class="shift-show-description">
+                                    <div class="shift-description-text" id="${descriptionId}">
+                                        ${show.description}
+                                    </div>
+                                    ${show.description.length > 150 ? `
+                                        <button class="shift-expand-button" onclick="ShiftSchedule.toggleDescription('${descriptionId}', this)">
+                                            Show more <span class="shift-expand-arrow">▼</span>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                this.scheduleContent.innerHTML = scheduleHtml;
+                
+                // Auto-scroll to current show if viewing today
+                if (this.selectedDay === 0 && currentShowIndex >= 0) {
+                    setTimeout(() => {
+                        const currentShowElement = document.getElementById(`shift-show-${currentShowIndex}`);
+                        if (currentShowElement) {
+                            // Scroll the element into view with some offset from top
+                            const container = this.scheduleContent;
+                            const elementTop = currentShowElement.offsetTop;
+                            container.scrollTop = elementTop - 20; // 20px padding from top
+                        }
+                    }, 100); // Small delay to ensure DOM is updated
+                }
+            },
+
+            updateCurrentShow: function() {
+                // Only update if viewing today
+                if (this.selectedDay === 0) {
+                    const oldCurrentId = this.currentShowId;
+                    const newCurrentId = this.getCurrentShow();
+                    
+                    if (oldCurrentId !== newCurrentId) {
+                        // Refresh the display if current show changed
+                        this.displaySchedule();
+                    }
+                }
+            },
+
+            toggleDescription: function(id, button) {
+                const desc = document.getElementById(id);
+                if (!desc) return;
+                
+                const arrow = button.querySelector('.shift-expand-arrow');
+                
+                desc.classList.toggle('expanded');
+                arrow.classList.toggle('rotated');
+                
+                if (desc.classList.contains('expanded')) {
+                    button.innerHTML = 'Show less <span class="shift-expand-arrow rotated">▼</span>';
+                } else {
+                    button.innerHTML = 'Show more <span class="shift-expand-arrow">▼</span>';
+                }
+            }
+        };
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                ShiftSchedule.init();
+            });
+        } else {
+            ShiftSchedule.init();
+        }
+
+        // Make functions globally available for onclick handlers
+        window.ShiftSchedule = ShiftSchedule;
+    })();
+    </script>
+</body>
+</html>
