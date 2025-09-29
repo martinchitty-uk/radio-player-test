@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIFT TTF RADIO Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .player-container {
+            width: 600px;
+            background: white;
+            border: 1px solid black;
+            padding: 30px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin: 0 auto 10px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .station-name {
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .play-button:hover {
+            background: #f0f0f0;
+        }
+
+        .play-icon, .pause-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .volume-control {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 1px;
+            background: black;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-track {
+            height: 100%;
+            background: black;
+            width: 70%;
+            position: relative;
+        }
+
+        .volume-handle {
+            width: 12px;
+            height: 12px;
+            border: 1px solid black;
+            background: white;
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .show-info {
+            margin-bottom: 25px;
+        }
+
+        .show-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .show-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .show-time {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .show-url {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .show-url a {
+            color: #666;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .show-url a:hover {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        .show-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            position: relative;
+        }
+
+        .description-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .description-text.expanded {
+            -webkit-line-clamp: unset;
+        }
+
+        .expand-button {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 11px;
+            color: #666;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .expand-button:hover {
+            color: #000;
+        }
+
+        .expand-arrow {
+            display: inline-block;
+            margin-left: 3px;
+            transition: transform 0.3s;
+        }
+
+        .expand-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .next-show {
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .error {
+            color: #ff0000;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="shift-logo.jpg" alt="SHIFT TTF RADIO Logo" onerror="this.style.display='none'">
+            </div>
+            <div class="station-name">SHIFT TTF RADIO</div>
+        </div>
+
+        <div class="controls">
+            <button class="play-button" id="playButton">
+                <svg class="play-icon" id="playIcon" viewBox="0 0 20 20" fill="none" stroke="black" stroke-width="1">
+                    <polygon points="6,4 16,10 6,16" fill="black"/>
+                </svg>
+                <svg class="pause-icon" id="pauseIcon" viewBox="0 0 20 20" fill="none" stroke="black" stroke-width="1" style="display:none;">
+                    <rect x="6" y="4" width="3" height="12" fill="black"/>
+                    <rect x="11" y="4" width="3" height="12" fill="black"/>
+                </svg>
+            </button>
+            
+            <div class="volume-control">
+                <svg class="volume-icon" viewBox="0 0 20 20" fill="none" stroke="black" stroke-width="1">
+                    <polygon points="4,7 8,7 12,3 12,17 8,13 4,13" fill="black"/>
+                    <path d="M14,7 Q16,10 14,13" fill="none"/>
+                </svg>
+                <div class="volume-slider" id="volumeSlider">
+                    <div class="volume-track" id="volumeTrack">
+                        <div class="volume-handle" id="volumeHandle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="show-info" id="currentShow">
+            <div class="show-label">CURRENT SHOW</div>
+            <div class="loading">Loading show information...</div>
+        </div>
+
+        <div class="show-info next-show" id="nextShow">
+            <div class="show-label">NEXT SHOW</div>
+            <div class="loading">Loading show information...</div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="none" playsinline>
+        <source src="https://shift.out.airtime.pro:8000/shift_a" type="audio/mpeg">
+        <source src="https://shift.out.airtime.pro:8000/shift_a" type="audio/ogg">
+    </audio>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeTrack = document.getElementById('volumeTrack');
+        const volumeHandle = document.getElementById('volumeHandle');
+        const currentShowDiv = document.getElementById('currentShow');
+        const nextShowDiv = document.getElementById('nextShow');
+
+        let isPlaying = false;
+        let isDragging = false;
+
+        // Play/Pause functionality
+        playButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            } else {
+                // Ensure the audio context is resumed (for mobile browsers)
+                audioPlayer.play().catch(e => {
+                    console.error('Playback failed:', e);
+                    // Retry with user interaction
+                    alert('Please click play again to start the stream.');
+                });
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Handle audio errors and reconnection
+        audioPlayer.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            if (isPlaying) {
+                // Try to reconnect after error
+                setTimeout(() => {
+                    audioPlayer.load();
+                    audioPlayer.play().catch(err => console.error('Reconnection failed:', err));
+                }, 2000);
+            }
+        });
+
+        // Ensure playback continues when possible
+        audioPlayer.addEventListener('pause', () => {
+            if (isPlaying && !document.hidden) {
+                // If we didn't mean to pause, try to resume
+                audioPlayer.play().catch(e => console.error('Resume failed:', e));
+            }
+        });
+
+        // Update UI when audio actually plays/pauses
+        audioPlayer.addEventListener('play', () => {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            isPlaying = true;
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            isPlaying = false;
+        });
+
+        // Volume control
+        function updateVolume(x) {
+            const rect = volumeSlider.getBoundingClientRect();
+            let percentage = (x - rect.left) / rect.width;
+            percentage = Math.max(0, Math.min(1, percentage));
+            
+            volumeTrack.style.width = (percentage * 100) + '%';
+            audioPlayer.volume = percentage;
+        }
+
+        volumeSlider.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateVolume(e.clientX);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateVolume(e.clientX);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Fetch show information
+        async function fetchShowInfo() {
+            try {
+                const response = await fetch('https://shift.airtime.pro/api/live-info-v2');
+                const data = await response.json();
+                
+                // Current show
+                if (data.shows && data.shows.current) {
+                    const current = data.shows.current;
+                    const currentHtml = `
+                        <div class="show-label">CURRENT SHOW</div>
+                        <div class="show-title">${current.name || 'Unknown Show'}</div>
+                        <div class="show-time">${formatTime(current.starts)} - ${formatTime(current.ends)}</div>
+                        ${current.url ? `<div class="show-url"><a href="${current.url}" target="_blank" rel="noopener noreferrer">${current.url}</a></div>` : ''}
+                        ${current.description ? `
+                            <div class="show-description">
+                                <div class="description-text" id="currentDesc">
+                                    ${current.description}
+                                </div>
+                                ${current.description.length > 200 ? `
+                                    <button class="expand-button" onclick="toggleDescription('currentDesc', this)">
+                                        Show more <span class="expand-arrow">▼</span>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    `;
+                    currentShowDiv.innerHTML = currentHtml;
+                } else {
+                    currentShowDiv.innerHTML = '<div class="show-label">CURRENT SHOW</div><div class="show-title">No show information available</div>';
+                }
+                
+                // Next show
+                if (data.shows && data.shows.next && data.shows.next.length > 0) {
+                    const next = data.shows.next[0];
+                    const nextHtml = `
+                        <div class="show-label">NEXT SHOW</div>
+                        <div class="show-title">${next.name || 'Unknown Show'}</div>
+                        <div class="show-time">${formatTime(next.starts)} - ${formatTime(next.ends)}</div>
+                        ${next.url ? `<div class="show-url"><a href="${next.url}" target="_blank" rel="noopener noreferrer">${next.url}</a></div>` : ''}
+                    `;
+                    nextShowDiv.innerHTML = nextHtml;
+                } else {
+                    nextShowDiv.innerHTML = '<div class="show-label">NEXT SHOW</div><div class="show-title">No upcoming show scheduled</div>';
+                }
+                
+            } catch (error) {
+                console.error('Error fetching show info:', error);
+                currentShowDiv.innerHTML = '<div class="show-label">CURRENT SHOW</div><div class="error">Unable to load show information</div>';
+                nextShowDiv.innerHTML = '<div class="show-label">NEXT SHOW</div><div class="error">Unable to load show information</div>';
+            }
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return '';
+            
+            try {
+                let date;
+                
+                // Handle Safari's stricter date parsing
+                // If the date string doesn't explicitly include timezone, treat it as UTC
+                if (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-')) {
+                    // Has timezone info
+                    date = new Date(dateString);
+                } else {
+                    // No timezone info - assume UTC and add Z
+                    const cleanDateString = dateString.includes('T') 
+                        ? dateString + 'Z' 
+                        : dateString.replace(' ', 'T') + 'Z';
+                    date = new Date(cleanDateString);
+                }
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    // Try alternative parsing for Safari
+                    const altDateString = dateString.replace(/-/g, '/').replace('T', ' ');
+                    date = new Date(altDateString + ' UTC');
+                    
+                    if (isNaN(date.getTime())) {
+                        return dateString; // Return original if can't parse
+                    }
+                }
+                
+                // Format with London timezone (handles BST/GMT automatically)
+                // Using Intl.DateTimeFormat for better Safari compatibility
+                const formatter = new Intl.DateTimeFormat('en-GB', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'Europe/London'
+                });
+                
+                return formatter.format(date);
+                
+            } catch (e) {
+                console.error('Error parsing date:', e, dateString);
+                return dateString;
+            }
+        }
+
+        function toggleDescription(id, button) {
+            const desc = document.getElementById(id);
+            const arrow = button.querySelector('.expand-arrow');
+            
+            desc.classList.toggle('expanded');
+            arrow.classList.toggle('rotated');
+            
+            if (desc.classList.contains('expanded')) {
+                button.innerHTML = 'Show less <span class="expand-arrow rotated">▼</span>';
+            } else {
+                button.innerHTML = 'Show more <span class="expand-arrow">▼</span>';
+            }
+        }
+
+        // Initial load and refresh every minute
+        fetchShowInfo();
+        setInterval(fetchShowInfo, 60000);
+
+        // Set initial volume to 70%
+        audioPlayer.volume = 0.7;
+    </script>
+</body>
+</html>
