@@ -435,57 +435,61 @@
                 const today = new Date();
                 const todayDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
                 
+                console.log('Processing schedule starting:', today.toDateString());
                 console.log('Today is:', ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][todayDay]);
 
-                // Map day names to day numbers
-                const dayMap = {
-                    'sunday': 0,
-                    'monday': 1,
-                    'tuesday': 2,
-                    'wednesday': 3,
-                    'thursday': 4,
-                    'friday': 5,
-                    'saturday': 6
-                };
+                const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-                // First, process current week days
-                Object.keys(dayMap).forEach(dayName => {
-                    if (data[dayName] && Array.isArray(data[dayName]) && data[dayName].length > 0) {
-                        const targetDayOfWeek = dayMap[dayName];
-                        let daysFromToday = targetDayOfWeek - todayDay;
-                        
-                        // If negative, this day has passed - will use next week's data
-                        if (daysFromToday < 0) {
-                            daysFromToday += 7;
+                // For each of the next 7 days
+                for (let i = 0; i < 7; i++) {
+                    const targetDate = new Date(today);
+                    targetDate.setDate(today.getDate() + i);
+                    const targetDayNum = targetDate.getDay();
+                    const targetDayName = dayNames[targetDayNum];
+                    
+                    let apiKey;
+                    
+                    // Special handling for Sunday (day 0)
+                    // When today is Sunday, the API's "monday" through "saturday" are LAST week
+                    // So we need to use "next" for all upcoming weekdays
+                    if (todayDay === 0) {
+                        // Today is Sunday
+                        if (i === 0) {
+                            // Today (Sunday) - use current
+                            apiKey = 'sunday';
+                        } else {
+                            // All other days this week need "next" prefix
+                            apiKey = 'next' + targetDayName;
                         }
-                        
-                        if (daysFromToday < 7) {
-                            console.log(`Adding ${data[dayName].length} shows to ${dayName} (index ${daysFromToday})`);
-                            weekSchedule[daysFromToday] = data[dayName];
+                    } else {
+                        // Normal logic for Monday-Saturday
+                        if (i === 0) {
+                            // Today - always use current week
+                            apiKey = targetDayName;
+                        } else if (targetDayNum > todayDay || targetDayNum === 0) {
+                            // Later this week OR Sunday (which is start of next week)
+                            if (targetDayNum === 0) {
+                                // Sunday is always "next" week when viewing from Mon-Sat
+                                apiKey = 'next' + targetDayName;
+                            } else {
+                                // Regular weekday later this week
+                                apiKey = targetDayName;
+                            }
+                        } else {
+                            // We've wrapped to next week (day number <= today's)
+                            apiKey = 'next' + targetDayName;
                         }
                     }
-                });
-
-                // Then fill any gaps with next week's data
-                Object.keys(dayMap).forEach(dayName => {
-                    const nextKey = 'next' + dayName;
-                    if (data[nextKey] && Array.isArray(data[nextKey]) && data[nextKey].length > 0) {
-                        const targetDayOfWeek = dayMap[dayName];
-                        let daysFromToday = targetDayOfWeek - todayDay;
-                        
-                        if (daysFromToday <= 0) {
-                            daysFromToday += 7;
-                        }
-                        
-                        // Only add if within 7 days and slot is empty
-                        if (daysFromToday < 7 && weekSchedule[daysFromToday].length === 0) {
-                            console.log(`Adding ${data[nextKey].length} shows from next week to ${dayName} (index ${daysFromToday})`);
-                            weekSchedule[daysFromToday] = data[nextKey];
-                        }
+                    
+                    const shows = data[apiKey] || [];
+                    
+                    console.log(`Day ${i} (${targetDate.toDateString()}): Using "${apiKey}" - ${shows.length} shows`);
+                    
+                    if (Array.isArray(shows)) {
+                        weekSchedule[i] = shows;
                     }
-                });
+                }
 
-                console.log('Schedule for next 7 days:', weekSchedule.map(day => day.length + ' shows'));
                 return weekSchedule;
             },
 
