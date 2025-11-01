@@ -440,50 +440,44 @@
 
                 const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
+                // IMPORTANT: Airtime API week runs Monday-Sunday (not Sunday-Saturday)
+                // So Sunday is day 7 of the API week, not day 0
+                
+                // Convert JavaScript day (0=Sun) to API week day (1=Mon, 7=Sun)
+                const getApiWeekDay = (jsDay) => {
+                    return jsDay === 0 ? 7 : jsDay;
+                };
+                
+                const todayApiDay = getApiWeekDay(todayDay);
+                console.log('Today in API week terms: day', todayApiDay, '(1=Mon, 7=Sun)');
+
                 // For each of the next 7 days
                 for (let i = 0; i < 7; i++) {
                     const targetDate = new Date(today);
                     targetDate.setDate(today.getDate() + i);
                     const targetDayNum = targetDate.getDay();
                     const targetDayName = dayNames[targetDayNum];
+                    const targetApiDay = getApiWeekDay(targetDayNum);
                     
                     let apiKey;
                     
-                    // Special handling for Sunday (day 0)
-                    // When today is Sunday, the API's "monday" through "saturday" are LAST week
-                    // So we need to use "next" for all upcoming weekdays
-                    if (todayDay === 0) {
-                        // Today is Sunday
-                        if (i === 0) {
-                            // Today (Sunday) - use current
-                            apiKey = 'sunday';
-                        } else {
-                            // All other days this week need "next" prefix
-                            apiKey = 'next' + targetDayName;
-                        }
+                    // Determine if we need "next" prefix
+                    // We need "next" when we've moved to the next API week (Mon-Sun)
+                    if (i === 0) {
+                        // Today - always use current week
+                        apiKey = targetDayName;
+                    } else if (targetApiDay > todayApiDay) {
+                        // Later in the same API week
+                        apiKey = targetDayName;
                     } else {
-                        // Normal logic for Monday-Saturday
-                        if (i === 0) {
-                            // Today - always use current week
-                            apiKey = targetDayName;
-                        } else if (targetDayNum > todayDay || targetDayNum === 0) {
-                            // Later this week OR Sunday (which is start of next week)
-                            if (targetDayNum === 0) {
-                                // Sunday is always "next" week when viewing from Mon-Sat
-                                apiKey = 'next' + targetDayName;
-                            } else {
-                                // Regular weekday later this week
-                                apiKey = targetDayName;
-                            }
-                        } else {
-                            // We've wrapped to next week (day number <= today's)
-                            apiKey = 'next' + targetDayName;
-                        }
+                        // We've wrapped to next API week (target day <= today in API terms)
+                        // This happens when going from Sun (7) to Mon (1)
+                        apiKey = 'next' + targetDayName;
                     }
                     
                     const shows = data[apiKey] || [];
                     
-                    console.log(`Day ${i} (${targetDate.toDateString()}): Using "${apiKey}" - ${shows.length} shows`);
+                    console.log(`Day ${i} (${targetDate.toDateString()}): API day ${targetApiDay}, Using "${apiKey}" - ${shows.length} shows`);
                     
                     if (Array.isArray(shows)) {
                         weekSchedule[i] = shows;
